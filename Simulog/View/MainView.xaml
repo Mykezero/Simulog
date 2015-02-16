@@ -1,0 +1,93 @@
+﻿<Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:simulog="clr-namespace:Simulog"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        x:Class="Simulog.View.MainView"
+        Title="Simulog - Multi Character Private Server Login For Ashita V2"
+        Width="500"
+        Height="281.25"
+        WindowStartupLocation="CenterScreen">
+    <Window.Background>
+        <LinearGradientBrush StartPoint="0,0"
+                             EndPoint="1,1">
+            <GradientStop Color="#ffffff"
+                          Offset="0" />
+            <GradientStop Color="#f1f1f1"
+                          Offset=".5" />
+            <GradientStop Color="#e1e1e1"
+                          Offset=".51" />            
+            <GradientStop Color="#f6f6f6"
+                          Offset="1.0" />
+        </LinearGradientBrush>
+    </Window.Background>
+    <DockPanel>
+        <Menu DockPanel.Dock="Top">
+            <MenuItem Header="_File">
+                <MenuItem Header="_Login"
+                          Command="{Binding LoginCommand}" />
+            </MenuItem>
+        </Menu>
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+
+            <!-- Server IP Settings-->
+            <Label Content="Server IP"
+                   Margin="5" />
+            <TextBox Text="{Binding Path=Settings.ServerIP}"
+                     Grid.Column="1"
+                     Grid.ColumnSpan="2"
+                     Margin="5" />
+
+            <Label Grid.Row="1"
+                   Content="Copy From"
+                   Margin="5" />
+            <TextBox Grid.Row="1"
+                     Grid.Column="1"
+                     IsReadOnly="True"
+                     Text="{Binding Path=Settings.ConfigurationFilePath}"
+                     Margin="5" />
+            <Button Grid.Row="1"
+                    Grid.Column="2"
+                    Content="Set..."
+                    Margin="5"
+                    Command="{Binding SetCommand}" />
+
+            <!-- Account Settings-->
+            <GroupBox Header="Accounts"
+                      Grid.Row="2"
+                      Grid.ColumnSpan="3"
+                      Margin="5">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+
+                    <DataGrid Grid.Row="1"
+                              Grid.ColumnSpan="2"
+                              ItemsSource="{Binding Path=Settings.Accounts}">
+                        <!-- Make columns take up as much evenly as possible. -->
+                        <DataGrid.ColumnWidth>
+                            <DataGridLength>*</DataGridLength>
+                        </DataGrid.ColumnWidth>
+                    </DataGrid>
+                </Grid>
+            </GroupBox>
+        </Grid>
+    </DockPanel>
+</Window>
