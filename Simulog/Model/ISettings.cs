@@ -8,9 +8,19 @@ namespace Simulog.Model
     public interface ISettings
     {
         /// <summary>
+        /// The starting file dialog directory. 
+        /// </summary>
+        string InitialDirectory { get; set; }
+
+        /// <summary>
         /// Path to the configuration xml. 
         /// </summary>
-        string ConfigurationFilePath { get; set; }
+        string ConfigurationPath { get; set; }
+
+        /// <summary>
+        /// Path to the configuration xml. 
+        /// </summary>
+        string ClientPath{ get; set; }
         
         /// <summary>
         /// Server to log-on to. 

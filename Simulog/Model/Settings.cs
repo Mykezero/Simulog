@@ -20,11 +20,27 @@ namespace Simulog.Model
             set { SetProperty(ref _serverIP, value); }
         }
 
-        private string _configurationFilePath;
-        public string ConfigurationFilePath
+        private string initialDirectory;
+
+        public string InitialDirectory
         {
-            get { return _configurationFilePath; }
-            set { SetProperty(ref _configurationFilePath, value); }
+            get { return initialDirectory; }
+            set { initialDirectory = value; }
+        }
+
+
+        private string _configurationPath;
+        public string ConfigurationPath
+        {
+            get { return _configurationPath; }
+            set { SetProperty(ref _configurationPath, value); }
+        }
+
+        private string _clientPath;
+        public string ClientPath
+        {
+            get { return _clientPath; }
+            set { SetProperty(ref _clientPath, value); }
         }
 
         public ObservableCollection<Account> Accounts { get; set; }
@@ -32,7 +48,8 @@ namespace Simulog.Model
         public Settings()
         {
             this.ServerIP = "127.0.0.1";
-            this.ConfigurationFilePath = string.Empty;
+            this.InitialDirectory = System.Environment.CurrentDirectory;
+            this.ConfigurationPath = string.Empty;
             this.Accounts = new ObservableCollection<Account>();
         }
 
@@ -55,7 +72,9 @@ namespace Simulog.Model
 
             // Add loaded file's fields to this object. 
             this.Accounts = Settings.Accounts;
-            this.ConfigurationFilePath = Settings.ConfigurationFilePath;
+            this.InitialDirectory = Settings.InitialDirectory;
+            this.ConfigurationPath = Settings.ConfigurationPath;
+            this.ClientPath = Settings.ClientPath;
             this.ServerIP = Settings.ServerIP;
 
             xr.Dispose();

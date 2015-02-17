@@ -19,9 +19,25 @@ namespace Simulog
     /// </summary>
     public class MainViewModel : IViewModel
     {
+        /// <summary>
+        /// Client used for launching sessions. 
+        /// </summary>
         private static readonly string PROGRAM_NAME = "Ashita";
+        
+        /// <summary>
+        /// Client used for launching sessions. Includes the extension. 
+        /// </summary>
         private static readonly string PROGRAM_NAME_LONG = string.Empty;
+
+        /// <summary>
+        /// The client's extension (.exe)
+        /// </summary>
         private static readonly string PROGRAM_EXTENSION = ".exe";
+        
+        /// <summary>
+        /// The command line argument that allows us to launch the client
+        /// by specifying a configuration file to use. 
+        /// </summary>
         private static readonly string COMMAND_ARGUMENT = "--config=";
 
         public ISettings Settings { get; set; }
@@ -31,27 +47,69 @@ namespace Simulog
             PROGRAM_NAME_LONG = PROGRAM_NAME + PROGRAM_EXTENSION;
         }
 
+        /// <summary>
+        /// Set settings and create command bindings. 
+        /// </summary>
+        /// <param name="settings"></param>
         public MainViewModel(ISettings settings)
         {
             this.Settings = settings;
             this.LoginCommand = new DelegateCommand(Login);
-            this.SetCommand = new DelegateCommand(Set);
+            this.SetClientCommand = new DelegateCommand(SetClient);
+            this.SetConfigurationCommand = new DelegateCommand(SetConfiguration);
         }
 
-        public ICommand SetCommand { get; set; }
+        /// <summary>
+        /// UI binds to this for setting the configuration file. 
+        /// </summary>
+        public ICommand SetConfigurationCommand { get; set; }
 
-        private void Set()
+        /// <summary>
+        /// Ask user to select the path to a 
+        /// configuration file. 
+        /// </summary>
+        private void SetConfiguration()
         {
-            // Prompt user to select configuration file. 
+            var path = PromptUserForFile();
+            if (string.IsNullOrWhiteSpace(path)) return;
+            Settings.ConfigurationPath = path;
+        }
+
+        /// <summary>
+        /// UI binds to this for setting the client. 
+        /// </summary>
+        public ICommand SetClientCommand { get; set; }
+
+        /// <summary>
+        /// Ask user to select the path to their 
+        /// Ashita client. 
+        /// </summary>
+        private void SetClient()
+        {
+            var path = PromptUserForFile();
+            if (string.IsNullOrWhiteSpace(path)) return;            
+            Settings.ClientPath = path;
+        }
+
+        /// <summary>
+        /// Prompts user to select a file and returns the 
+        /// path to that file. 
+        /// </summary>
+        /// <returns></returns>
+        private String PromptUserForFile()
+        {
+            // Prompt user to select a file. 
             OpenFileDialog ofd = new OpenFileDialog();
-            ofd.InitialDirectory = Environment.CurrentDirectory;
+            ofd.InitialDirectory = Settings.InitialDirectory;
             ofd.ShowDialog();
-            
+
             // Set file if one was found. 
-            if (ofd.CheckFileExists)
+            if (File.Exists(ofd.FileName))
             {
-                Settings.ConfigurationFilePath = ofd.FileName;
+                Settings.InitialDirectory = ofd.FileName;
+                return ofd.FileName;
             }
+            else return string.Empty;
         }
 
         /// <summary>
@@ -67,7 +125,7 @@ namespace Simulog
             // Inform user that their configuration 
             // file could not be found. Maybe they forgot to
             // set it. 
-            if (!File.Exists(Settings.ConfigurationFilePath))
+            if (!File.Exists(Settings.ConfigurationPath))
             {
                 var message = DocString(@"The configuration file was not found, 
                 and must be set before logging in.");
@@ -79,11 +137,11 @@ namespace Simulog
 
             // Inform user that this program is not in the 
             // same directory as the target program.
-            if (!File.Exists(PROGRAM_NAME_LONG))
+            if (!File.Exists(Settings.ClientPath))
             {
                 var message = DocString(
-                    @"{0} could not be found. Please make sure this 
-                    executable is in the same folder as {1}.",
+                    @"{0} could not be found. Please make sure you've 
+                    set the path to {1}.",
                     PROGRAM_NAME, PROGRAM_NAME_LONG);
                 var caption = DocString("{0} not found", PROGRAM_NAME);
                 MessageBox.Show(message, caption,
@@ -91,14 +149,25 @@ namespace Simulog
                 return;
             }
 
+            // Change our directory into the Ashita's directory. 
+            Directory.SetCurrentDirectory(Directory.GetParent
+                (Settings.ClientPath).FullName);
+
             // Log each account onto the private server of choice. 
             foreach (var account in Settings.Accounts)
             {
+                // Get the path to the about to be created configuration file. 
+                var copiedConfigurationPath = Path.Combine(Directory.GetParent(
+                    Settings.ConfigurationPath).FullName, account.Name);
+
                 // Create a new file from the user's selected configuration file. 
-                File.Copy(Settings.ConfigurationFilePath, account.Name, true);
-                AlterConfigurationXml(account);
-                File.Copy(account.Name, FindPath(account.Name), true);
-                Process.Start(PROGRAM_NAME, COMMAND_ARGUMENT + account.Name);
+                File.Copy(Settings.ConfigurationPath, copiedConfigurationPath, true);
+
+                // Alter the new configuration file with the account data. 
+                AlterConfigurationXml(copiedConfigurationPath, account);
+
+                // Start a new client session for the account 
+                Process.Start(Settings.ClientPath, COMMAND_ARGUMENT + account.Name);
             }
         }
 
@@ -124,11 +193,11 @@ namespace Simulog
         /// given account.
         /// </summary>
         /// <param name="account"></param>
-        private void AlterConfigurationXml(Account account)
+        private void AlterConfigurationXml(String path, Account account)
         {
             // Find the current attribute that contains 
             // the boot command. 
-            XDocument copy = XDocument.Load(account.Name);
+            XDocument copy = XDocument.Load(path);
             var command = copy.Elements("settings").Elements("setting")
                 .Where(x => x.Attribute("name")
                 .Value == "boot_command")
@@ -143,13 +212,7 @@ namespace Simulog
                 account.Password);
 
             // Write the modified xml back to file. 
-            copy.Save(account.Name);
-        }
-
-        private String FindPath(string filename)
-        {
-            var parent = new FileInfo(Settings.ConfigurationFilePath).Directory.FullName;
-            return Path.Combine(parent, filename);
+            copy.Save(path);
         }
 
         /// <summary>
@@ -164,6 +227,6 @@ namespace Simulog
         private string CreateBootCommand(String server, String user, String password)
         {
             return "--server " + server + " --user " + user + " --pass " + password;
-        }        
+        }
     }
 }

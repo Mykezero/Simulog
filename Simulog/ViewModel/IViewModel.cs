@@ -11,6 +11,6 @@ namespace Simulog.ViewModel
     {
         ISettings Settings { get; set; }
         ICommand LoginCommand { get; set; }
-        ICommand SetCommand { get; set; }
+        ICommand SetConfigurationCommand { get; set; }
     }
 }
