@@ -167,7 +167,7 @@ namespace Simulog
                 AlterConfigurationXml(copiedConfigurationPath, account);
 
                 // Start a new client session for the account 
-                Process.Start(Settings.ClientPath, COMMAND_ARGUMENT + account.Name);
+                Process.Start(Settings.ClientPath, COMMAND_ARGUMENT + copiedConfigurationPath);
             }
         }
 
