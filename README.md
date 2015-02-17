@@ -20,14 +20,14 @@ You need to install [Microsoft .NET Framework 4.5](http://www.microsoft.com/en-u
 
 # Frequently Asked Questions
 
-**How is my account information being handled?**
+## How is my account information being handled?
 
 Your account information is handled the same way the Ashita client handles them, by storing them in configuration files in the boot_command section, so there is no added security risk. 
 
-**Does the program connect to the internet?**
+## Does the program connect to the internet?
 
 This program never has to connect to the internet. All of the game operations are still handled by the Ashita client. 
 
-**Does the program allow logging characters into different servers?**
+## Does the program allow logging characters into different servers?
 
 The program only allows characters to be logged in the same server. 
