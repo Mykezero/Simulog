@@ -156,6 +156,12 @@ namespace Simulog
             // Log each account onto the private server of choice. 
             foreach (var account in Settings.Accounts)
             {
+                // Account name is null or empty; we can't log this account in. 
+                if (string.IsNullOrWhiteSpace(account.Name)) continue;
+
+                // Password is null or empty; we can't log this account in. 
+                if (string.IsNullOrWhiteSpace(account.Password)) continue;
+
                 // Get the path to the about to be created configuration file. 
                 var copiedConfigurationPath = Path.Combine(Directory.GetParent(
                     Settings.ConfigurationPath).FullName, account.Name);
