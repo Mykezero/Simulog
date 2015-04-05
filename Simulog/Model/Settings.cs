@@ -11,9 +11,16 @@ namespace Simulog.Model
     /// </summary>
     public class Settings : BindableBase, ISettings
     {
+        /// <summary>
+        /// The name of the file where all our settings are going to be stored. 
+        /// </summary>
         private static readonly string SETTINGS_FILE = "settings.xml";
 
         private string _serverIP;
+
+        /// <summary>
+        /// The IP of the server we are login accounts onto. 
+        /// </summary>
         public string ServerIP
         {
             get { return _serverIP; }
@@ -22,14 +29,20 @@ namespace Simulog.Model
 
         private string initialDirectory;
 
+        /// <summary>
+        /// The initial directory to look for clients / configuration files in. 
+        /// </summary>
         public string InitialDirectory
         {
             get { return initialDirectory; }
             set { initialDirectory = value; }
         }
 
-
         private string _configurationPath;
+        
+        /// <summary>
+        /// Path the configuration path with the user's desired GUI settings. 
+        /// </summary>
         public string ConfigurationPath
         {
             get { return _configurationPath; }
@@ -37,12 +50,19 @@ namespace Simulog.Model
         }
 
         private string _clientPath;
+
+        /// <summary>
+        /// Path the Ashita Client. 
+        /// </summary>
         public string ClientPath
         {
             get { return _clientPath; }
             set { SetProperty(ref _clientPath, value); }
         }
 
+        /// <summary>
+        /// List of accounts to log in. 
+        /// </summary>
         public ObservableCollection<Account> Accounts { get; set; }
 
         public Settings()
@@ -53,6 +73,9 @@ namespace Simulog.Model
             this.Accounts = new ObservableCollection<Account>();
         }
 
+        /// <summary>
+        /// Saves this sessions settings to file. 
+        /// </summary>
         public void Save()
         {
             // Serialize the accounts. 
@@ -62,6 +85,9 @@ namespace Simulog.Model
             xw.Dispose();
         }
 
+        /// <summary>
+        /// Load settings from last session from file. 
+        /// </summary>
         public void Load()
         {
             if (!File.Exists(SETTINGS_FILE)) return;
